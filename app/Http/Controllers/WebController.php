@@ -285,9 +285,10 @@ class WebController extends Controller
         if (count($getVN) > 0) {
             $data = [];
             foreach ($getVN as $vn) {
+                $dob            = $this->FulldateTH($vn->BirthDateTime);
                 $data['status'] = 'success';
                 $data['name']   = $this->Fullname($vn->FirstName, $vn->LastName);
-                $data['dob']    = date('d M Y', strtotime($vn->BirthDateTime));
+                $data['dob']    = $dob['date'];
                 $data['vn'][]   = $vn->VN;
             }
         } else {
@@ -321,11 +322,12 @@ class WebController extends Controller
             ->first();
 
         if ($getVN !== null) {
+            $dob  = $this->FulldateTH($getVN->BirthDateTime);
             $data = [
                 'status' => 'success',
                 'hn'     => $getVN->HN,
                 'name'   => $this->Fullname($getVN->FirstName, $getVN->LastName),
-                'dob'    => date('d M Y', strtotime($getVN->BirthDateTime)),
+                'dob'    => $dob['date'],
             ];
 
         } else {
