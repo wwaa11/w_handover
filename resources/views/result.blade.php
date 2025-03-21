@@ -115,7 +115,7 @@
                 <hr class="my-3 text-[#008387]">
                 <table class="w-full table-auto">
                     <thead>
-                        <th class="border border-gray-400 p-3 text-xl text-[#008387]" colspan="12">
+                        <th class="border border-gray-400 p-3 text-xl text-[#008387]" colspan="10">
                             Patient Journey
                         </th>
                     </thead>
@@ -130,8 +130,8 @@
                         <th class="border border-gray-400 p-3">BPDias</th>
                         <th class="border border-gray-400 p-3">O2Sat</th>
                         <th class="border border-gray-400 p-3">BMI </th>
-                        <th class="border border-gray-400 p-3">Pain Score</th>
-                        <th class="border border-gray-400 p-3">V/S Memo</th>
+                        {{-- <th class="border border-gray-400 p-3">Pain Score</th> --}}
+                        {{-- <th class="border border-gray-400 p-3">V/S Memo</th> --}}
                     </thead>
                     <tbody>
                         @foreach ($data["assessment"] as $index => $item)
@@ -168,27 +168,26 @@
                                     <td class="border border-gray-300 p-2 text-center">
                                         {{ $item["vitalsigns"]["bmi"] }}
                                     </td>
-                                    <td class="border border-gray-300 p-2 text-center">
+                                    {{-- <td class="border border-gray-300 p-2 text-center">
                                         {{ $item["vitalsigns"]["pain"] }}
                                     </td>
                                     <td class="border border-gray-300 p-2">
                                         {{ $item["vitalsigns"]["memo"] }}
-                                    </td>
-
+                                    </td> --}}
                                 </tr>
                                 <tr class="hidden bg-green-100" id="pres{{ $index }}">
                                     <td class="border border-gray-300 p-2" colspan="2"></td>
                                     <td class="border border-gray-300 p-2 font-bold" colspan="1">
                                         Isolation/Precautions
                                     </td>
-                                    <td class="border border-gray-300 p-2 text-center" colspan="2">
+                                    <td class="border border-gray-300 p-2 text-center" colspan="1">
                                         {{ $item["iso"] }}</td>
                                     <td class="border border-gray-300 p-2 font-bold" colspan="2">
                                         Consciousness
                                     </td>
                                     <td class="border border-gray-300 p-2 text-center" colspan="1">
                                         {{ $item["con"] }}</td>
-                                    <td class="border border-gray-300 p-2 font-bold" colspan="2">
+                                    <td class="border border-gray-300 p-2 font-bold" colspan="1">
                                         Fall Risk
                                     </td>
                                     <td class="border border-gray-300 p-2 text-center" colspan="2">
@@ -206,26 +205,36 @@
                             @elseif($item["type"] == "lab")
                                 <tr
                                     class="@if ($item["status"] == "SUCCESS") bg-green-200 @elseif($item["status"] == "Cxl") bg-red-300 @else bg-gray-100 @endif">
-                                    <td class="border border-gray-300 p-2 text-center">{{ $item["time"] }}</td>
+                                    <td class="border border-gray-300 p-2 text-center">
+                                        @if ($data["debug"])
+                                            <span class="block text-red-600">{{ $item["requestno"] }}</span>
+                                        @endif
+                                        {{ $item["time"] }}
+                                    </td>
                                     <td class="border border-gray-300 p-2">{{ $item["clinic"] }}</td>
                                     <td class="border border-gray-300 p-2">{{ $item["doctor"] }}</td>
                                     <td class="border border-gray-300 p-2 text-end font-bold" colspan="2">
                                         Clinical Info
                                     </td>
-                                    <td class="border border-gray-300 p-2" colspan="7">
+                                    <td class="border border-gray-300 p-2" colspan="5">
                                         {{ $item["memo"] }}
                                     </td>
                                 </tr>
                             @elseif($item["type"] == "xray")
                                 <tr
                                     class="@if ($item["status"] == "SUCCESS") bg-green-200 @elseif($item["status"] == "Cxl") bg-red-300 @else bg-gray-100 @endif">
-                                    <td class="border border-gray-300 p-2 text-center">{{ $item["time"] }}</td>
+                                    <td class="border border-gray-300 p-2 text-center">
+                                        @if ($data["debug"])
+                                            <span class="block text-red-600">{{ $item["requestno"] }}</span>
+                                        @endif
+                                        {{ $item["time"] }}
+                                    </td>
                                     <td class="border border-gray-300 p-2">{{ $item["clinic"] }}</td>
                                     <td class="border border-gray-300 p-2">{{ $item["doctor"] }}</td>
                                     <td class="border border-gray-300 p-2 text-end font-bold" colspan="2">
                                         Clinical Info
                                     </td>
-                                    <td class="border border-gray-300 p-2" colspan="7">
+                                    <td class="border border-gray-300 p-2" colspan="5">
                                         {{ $item["memo"] }}
                                     </td>
                                 </tr>
@@ -260,13 +269,13 @@
                                         {{ $item["o2sat"] }}
                                     </td>
                                     <td class="border border-gray-300 p-2 text-center">{{ $item["bmi"] }}</td>
-                                    <td class="border border-gray-300 p-2 text-center">{{ $item["pain"] }}</td>
-                                    <td class="border border-gray-300 p-2">{{ $item["memo"] }}</td>
+                                    {{-- <td class="border border-gray-300 p-2 text-center">{{ $item["pain"] }}</td> --}}
+                                    {{-- <td class="border border-gray-300 p-2">{{ $item["memo"] }}</td> --}}
                                 </tr>
                             @elseif($item["type"] == "vs_notification")
                                 <tr class="bg-red-400">
                                     <td class="border border-gray-300 p-2">{{ $item["time"] }}</td>
-                                    <td class="border border-gray-300 p-2 text-center" colspan="11">แจ้งเตือนวัด
+                                    <td class="border border-gray-300 p-2 text-center" colspan="10">แจ้งเตือนวัด
                                         Vital Sign
                                         อีกครั้ง (ทุก 4 ชั่วโมง)</td>
                                 </tr>

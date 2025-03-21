@@ -410,6 +410,7 @@ class WebController extends Controller
 
         $birthDate      = $this->FulldateTH($master->BirthDateTime);
         $data['result'] = true;
+        $data['debug']  = $showDebug;
         $data['info']   = [
             'visit'    => $this->FulldateTH($date),
             'vn'       => $master->VN,
@@ -668,14 +669,21 @@ class WebController extends Controller
                     $lab->Clinic = "Consult นักโภชนาการ";
                 }
 
+                try {
+                    $oldMemo = $data['assessment'][$lab->RequestNo]['memo'];
+                } catch (\Throwable $th) {
+                    $oldMemo = '-';
+                }
+
                 $data['assessment'][$lab->RequestNo] = [
                     'type'      => 'lab',
+                    'requestno' => $lab->RequestNo,
                     'time'      => ($labAppointment == '') ? date('H:i', strtotime($lab->MakeDateTime)) : date('H:i', strtotime($lab->ChargeDateTime)),
                     'clinic'    => "LAB : " . $lab->Clinic . ' ' . $labAppointment,
                     'doctor'    => $lab->RequestDoctor,
                     'recommend' => null,
                     'status'    => $status,
-                    'memo'      => ($lab->RemarksMemo !== null) ? $lab->RemarksMemo : '-',
+                    'memo'      => ($lab->RemarksMemo !== null && $lab->HNLABRequestMemoType == 1) ? $lab->RemarksMemo : $oldMemo,
                 ];
             }
         }
@@ -771,19 +779,29 @@ class WebController extends Controller
                 if ($xray->CxlDateTime !== null) {
                     $status = 'Cxl';
                 }
+
+                try {
+                    $oldMemo = $data['assessment'][$xray->RequestNo]['memo'];
+                } catch (\Throwable $th) {
+                    $oldMemo = '-';
+                }
+
                 $data['assessment'][$xray->RequestNo] = [
                     'type'      => 'xray',
+                    'requestno' => $xray->RequestNo,
                     'time'      => $time,
                     'clinic'    => $xray->FacilityRmsNo . " : " . $xray->Clinic . ' ' . $xrayAppointment,
                     'doctor'    => $xray->RequestDoctor,
                     'recommend' => null,
                     'status'    => $status,
-                    'memo'      => ($xray->HNXRayRequestMemoType == 2) ? $xray->RemarksMemo : '-',
+                    'memo'      => ($xray->HNXRayRequestMemoType == 2) ? $xray->RemarksMemo : $oldMemo,
                 ];
             }
         }
 
-        usort($data['assessment'], function ($item1, $item2) {return $item1['time'] <=> $item2['time'];});
+        usort($data['assessment'], function ($item1, $item2) {
+            return $item1['time'] <=> $item2['time'];
+        });
         $tempVS = null;
         foreach ($data['assessment'] as $index => $dataList) {
             if ($dataList['type'] == 'vs') {
@@ -818,11 +836,17 @@ class WebController extends Controller
                     ];
                 }
             }
+            // if (($index + 1) == count($data['assessment']) && $dataList['type'] == 'vs_notification') {
+            //     array_splice($data['assessment'], $index, 1);
+            // }
         }
+        usort($data['closeVisit'], function ($item2, $item1) {
+            return $item1['time'] <=> $item2['time'];
+        });
+
         if ($showDebug) {
             dump($data);
         }
-        usort($data['closeVisit'], function ($item2, $item1) {return $item1['time'] <=> $item2['time'];});
 
         return view('result')->with(compact('data'));
     }
