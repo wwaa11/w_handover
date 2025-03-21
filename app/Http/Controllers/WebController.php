@@ -593,8 +593,6 @@ class WebController extends Controller
             ->leftJoin('HNLABREQ_LOG', 'HNLABREQ_HEADER.RequestNo', 'HNLABREQ_LOG.RequestNo')
             ->leftJoin('HNLABREQ_MEMO', 'HNLABREQ_HEADER.RequestNo', 'HNLABREQ_MEMO.RequestNo')
             ->where('HNLABREQ_HEADER.HN', $hn)
-        // ->whereDate('HNLABREQ_HEADER.EntryDateTime', '>=', $date)
-        // ->whereNull('HNLABREQ_HEADER.CxlDateTime')
             ->where('HNLABREQ_LOG.HNLABRequestLogType', 25)
             ->select(
                 'HNLABREQ_HEADER.CxlDateTime',
@@ -674,8 +672,6 @@ class WebController extends Controller
             ->leftJoin('HNXRAYREQ_MEMO', 'HNXRAYREQ_HEADER.RequestNo', 'HNXRAYREQ_MEMO.RequestNo')
             ->leftJoin('HNXRAYREQ_CHARGE', 'HNXRAYREQ_HEADER.RequestNo', 'HNXRAYREQ_CHARGE.RequestNo')
             ->where('HNXRAYREQ_HEADER.HN', $hn)
-        // ->whereDate('EntryDateTime', '>=', $date)
-        // ->whereNull('HNXRAYREQ_HEADER.CxlDateTime')
             ->select(
                 'HNXRAYREQ_HEADER.CxlDateTime',
                 'HNXRAYREQ_HEADER.EntryDateTime',
