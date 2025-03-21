@@ -372,6 +372,7 @@ class WebController extends Controller
             ->join('HNPAT_NAME', 'HNOPD_MASTER.HN', 'HNPAT_NAME.HN')
             ->whereDate('Visitdate', $date)
             ->where('VN', $vn)
+            ->where('HNPAT_NAME.SuffixSmall', 0)
             ->first();
         if ($master == null) {
             $req->session()->flash('status', 'ไม่พบหมายเลข VN นี้');
@@ -592,8 +593,8 @@ class WebController extends Controller
             ->leftJoin('HNLABREQ_LOG', 'HNLABREQ_HEADER.RequestNo', 'HNLABREQ_LOG.RequestNo')
             ->leftJoin('HNLABREQ_MEMO', 'HNLABREQ_HEADER.RequestNo', 'HNLABREQ_MEMO.RequestNo')
             ->where('HNLABREQ_HEADER.HN', $hn)
-            ->whereDate('HNLABREQ_HEADER.EntryDateTime', '>=', $date)
-            ->whereNull('HNLABREQ_HEADER.CxlDateTime')
+        // ->whereDate('HNLABREQ_HEADER.EntryDateTime', '>=', $date)
+        // ->whereNull('HNLABREQ_HEADER.CxlDateTime')
             ->where('HNLABREQ_LOG.HNLABRequestLogType', 25)
             ->select(
                 'HNLABREQ_HEADER.CxlDateTime',
@@ -625,7 +626,7 @@ class WebController extends Controller
             ($lab->AppointmentDateTime !== null) ? $lab->AppointmentDate         = date('Y-m-d', strtotime($lab->AppointmentDateTime)) : null;
 
             $labToday       = false;
-            $labAppointment = false;
+            $labAppointment = '';
             switch ($lab) {
                 case $lab->Ward == null && $lab->EntryDateTime == $date && $lab->AppointmentNo == null:
                     $labToday = true;
@@ -638,7 +639,8 @@ class WebController extends Controller
                     $labAppointment = '(Appointment)';
                     break;
                 case $lab->Ward == null && $lab->AppointmentDateTime !== null && $lab->SpecimenReceiveDate == $date:
-                    $labToday = true;
+                    $labAppointment = '(Appointment)';
+                    $labToday       = true;
                     break;
             }
             if ($showDebug) {
@@ -649,6 +651,12 @@ class WebController extends Controller
                 $status = null;
                 if ($lab->SpecimenReceiveDateTime !== null) {
                     $status = 'SUCCESS';
+                }
+                if ($lab->CxlDateTime !== null) {
+                    $status = 'Cxl';
+                }
+                if ($lab->FacilityRmsNo == "DIET") {
+                    $lab->Clinic = "Consult นักโภชนาการ";
                 }
                 $data['assessment'][$lab->RequestNo] = [
                     'type'      => 'lab',
@@ -666,8 +674,8 @@ class WebController extends Controller
             ->leftJoin('HNXRAYREQ_MEMO', 'HNXRAYREQ_HEADER.RequestNo', 'HNXRAYREQ_MEMO.RequestNo')
             ->leftJoin('HNXRAYREQ_CHARGE', 'HNXRAYREQ_HEADER.RequestNo', 'HNXRAYREQ_CHARGE.RequestNo')
             ->where('HNXRAYREQ_HEADER.HN', $hn)
-            ->whereDate('EntryDateTime', '>=', $date)
-            ->whereNull('HNXRAYREQ_HEADER.CxlDateTime')
+        // ->whereDate('EntryDateTime', '>=', $date)
+        // ->whereNull('HNXRAYREQ_HEADER.CxlDateTime')
             ->select(
                 'HNXRAYREQ_HEADER.CxlDateTime',
                 'HNXRAYREQ_HEADER.EntryDateTime',
@@ -675,8 +683,10 @@ class WebController extends Controller
                 'HNXRAYREQ_HEADER.AcknowledgeFlag',
                 'HNXRAYREQ_HEADER.FacilityRmsNo',
                 'HNXRAYREQ_HEADER.Clinic',
+                'HNXRAYREQ_HEADER.Ward',
                 'HNXRAYREQ_HEADER.AcknowledgeDateTime',
                 'HNXRAYREQ_HEADER.DispatchFlimToDoctor',
+                'HNXRAYREQ_HEADER.CxlDateTime',
                 'HNXRAYREQ_CHARGE.ChargeDateTime',
                 'HNXRAYREQ_HEADER.RequestNo',
                 'HNXRAYREQ_HEADER.RequestDoctor',
@@ -701,15 +711,21 @@ class WebController extends Controller
             }
 
             $xrayToday       = false;
-            $xrayAppointment = false;
+            $xrayAppointment = '';
             switch ($xray) {
-                case $xray->EntryDateTime == $date && $xray->AppointmentNo == null && $xray->AcknowledgeFlag == 1:
+                // case $xray->EntryDateTime == $date && $xray->AppointmentNo == null && $xray->AcknowledgeFlag == 1:
+                case $xray->Ward == null && $xray->EntryDateTime == $date && $xray->AppointmentNo == null:
                     $xrayToday = true;
                     break;
-                case $xray->EntryDateTime == $date && $xray->EntryDateTime == $xray->AcknowledgeDate && $xray->AcknowledgeFlag == 1:
-                    $xrayToday = true;
+                case $xray->Ward == null && $xray->AcknowledgeDate == $date && $xray->AppointmentDateTime == $date:
+                    $xrayToday       = true;
+                    $xrayAppointment = '(Appointment)';
                     break;
-                case $xray->EntryDateTime == $date && $xray->FacilityRmsNo == 'INV':
+                case $xray->Ward == null && $xray->AcknowledgeDate == $date && $xray->AppointmentDateTime !== null:
+                    $xrayToday       = true;
+                    $xrayAppointment = '(Appointment)';
+                    break;
+                case $xray->Ward == null && $xray->EntryDateTime == $date && $xray->FacilityRmsNo == 'INV':
                     $xrayToday = true;
                     break;
             }
@@ -727,10 +743,13 @@ class WebController extends Controller
                 if ($xray->DispatchFlimToDoctor == 1) {
                     $status = 'SUCCESS';
                 }
+                if ($xray->CxlDateTime !== null) {
+                    $status = 'Cxl';
+                }
                 $data['assessment'][$xray->RequestNo] = [
                     'type'      => 'xray',
                     'time'      => $time,
-                    'clinic'    => $xray->FacilityRmsNo . " : " . $xray->Clinic,
+                    'clinic'    => $xray->FacilityRmsNo . " : " . $xray->Clinic . ' ' . $labAppointment,
                     'doctor'    => $xray->RequestDoctor,
                     'recommend' => null,
                     'status'    => $status,

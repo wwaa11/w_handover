@@ -204,34 +204,36 @@
                                     </td>
                                 </tr>
                             @elseif($item["type"] == "lab")
-                                <tr class="bg-gray-100">
+                                <tr
+                                    class="@if ($item["status"] == "SUCCESS") bg-green-200 @elseif($item["status"] == "Cxl") bg-red-300 @else bg-gray-100 @endif">
                                     <td class="border border-gray-300 p-2 text-center">{{ $item["time"] }}</td>
                                     <td class="border border-gray-300 p-2">{{ $item["clinic"] }}</td>
                                     <td class="border border-gray-300 p-2">{{ $item["doctor"] }}</td>
                                     <td class="border border-gray-300 p-2 text-end font-bold" colspan="2">
                                         RemarksMemo
                                     </td>
-                                    <td class="border border-gray-300 p-2" colspan="6">
+                                    <td class="border border-gray-300 p-2" colspan="7">
                                         {{ $item["memo"] }}
                                     </td>
-                                    <td class="border border-gray-300 p-2 text-center font-bold text-[#008387]">
+                                    {{-- <td class="border border-gray-300 p-2 text-center font-bold text-[#008387]">
                                         {{ $item["status"] }}
-                                    </td>
+                                    </td> --}}
                                 </tr>
                             @elseif($item["type"] == "xray")
-                                <tr class="bg-gray-100">
+                                <tr
+                                    class="@if ($item["status"] == "SUCCESS") bg-green-200 @elseif($item["status"] == "Cxl") bg-red-300 @else bg-gray-100 @endif">
                                     <td class="border border-gray-300 p-2 text-center">{{ $item["time"] }}</td>
                                     <td class="border border-gray-300 p-2">{{ $item["clinic"] }}</td>
                                     <td class="border border-gray-300 p-2">{{ $item["doctor"] }}</td>
                                     <td class="border border-gray-300 p-2 text-end font-bold" colspan="2">
                                         RemarksMemo
                                     </td>
-                                    <td class="border border-gray-300 p-2" colspan="6">
+                                    <td class="border border-gray-300 p-2" colspan="7">
                                         {{ $item["memo"] }}
                                     </td>
-                                    <td class="border border-gray-300 p-2 text-center font-bold text-[#008387]">
+                                    {{-- <td class="border border-gray-300 p-2 text-center font-bold text-[#008387]">
                                         {{ $item["status"] }}
-                                    </td>
+                                    </td> --}}
                                 </tr>
                             @elseif($item["type"] == "vs")
                                 <tr class="bg-[#ffe2c2]">
