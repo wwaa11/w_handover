@@ -595,8 +595,10 @@ class WebController extends Controller
         $Labs = DB::connection('SSB')->table('HNLABREQ_HEADER')
             ->leftJoin('HNLABREQ_LOG', 'HNLABREQ_HEADER.RequestNo', 'HNLABREQ_LOG.RequestNo')
             ->leftJoin('HNLABREQ_MEMO', 'HNLABREQ_HEADER.RequestNo', 'HNLABREQ_MEMO.RequestNo')
+            ->leftJoin('HNLABREQ_CHARGE', 'HNLABREQ_HEADER.RequestNo', 'HNLABREQ_CHARGE.RequestNo')
             ->where('HNLABREQ_HEADER.HN', $hn)
             ->where('HNLABREQ_LOG.HNLABRequestLogType', 25)
+            ->where('HNLABREQ_CHARGE.SuffixTiny', 1)
             ->select(
                 'HNLABREQ_HEADER.CxlDateTime',
                 'HNLABREQ_HEADER.EntryDateTime',
@@ -612,6 +614,7 @@ class WebController extends Controller
                 'HNLABREQ_LOG.MakeDateTime',
                 'HNLABREQ_MEMO.HNLABRequestMemoType',
                 'HNLABREQ_MEMO.RemarksMemo',
+                'HNLABREQ_CHARGE.ChargeDateTime'
             )
             ->get();
         if ($showDebug) {
@@ -667,7 +670,7 @@ class WebController extends Controller
 
                 $data['assessment'][$lab->RequestNo] = [
                     'type'      => 'lab',
-                    'time'      => date('H:i', strtotime($lab->MakeDateTime)),
+                    'time'      => ($labAppointment == '') ? date('H:i', strtotime($lab->MakeDateTime)) : date('H:i', strtotime($lab->ChargeDateTime)),
                     'clinic'    => "LAB : " . $lab->Clinic . ' ' . $labAppointment,
                     'doctor'    => $lab->RequestDoctor,
                     'recommend' => null,
@@ -690,6 +693,7 @@ class WebController extends Controller
                 'HNXRAYREQ_HEADER.AcknowledgeFlag',
                 'HNXRAYREQ_CHARGE.ChargeDateTime',
                 'HNXRAYREQ_HEADER.DispatchFlimToDoctor',
+                'HNXRAYREQ_HEADER.FixedDFResultDoctor',
                 'HNXRAYREQ_HEADER.FacilityRmsNo',
                 'HNXRAYREQ_HEADER.Clinic',
                 'HNXRAYREQ_HEADER.Ward',
@@ -759,6 +763,9 @@ class WebController extends Controller
                     $status = 'SUCCESS';
                 }
                 if ($xray->FacilityRmsNo == 'INV' && $xray->ResultDateTime !== null) {
+                    $status = 'SUCCESS';
+                }
+                if ($xray->FacilityRmsNo == 'INV' && $xray->FixedDFResultDoctor !== '*') {
                     $status = 'SUCCESS';
                 }
                 if ($xray->CxlDateTime !== null) {
