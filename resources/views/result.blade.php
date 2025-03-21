@@ -1,9 +1,9 @@
 @extends("layout")
 @section("content")
     <div class="fixed left-0 right-0 top-0 z-20 flex h-20 bg-gray-50 p-3 shadow-lg">
-        <div class="flex text-2xl font-bold text-[#008387]">
+        <div class="flex font-bold text-[#008387]">
             <img class="h-12" src="{{ url("images/Side Logo.png") }}" alt="logo">
-            <span class="inline-block p-3 align-baseline">Hand Over (OPD)</span>
+            <span class="inline-block p-3 align-baseline text-lg">Hand Over (OPD)</span>
 
         </div>
         <button class="my-1 cursor-pointer rounded bg-blue-600 p-3 text-white" type="button" onclick="homeBtn()">
@@ -31,7 +31,7 @@
         @if ($data["result"])
             <div class="my-6 flex w-full rounded-lg border border-[#008387] bg-gray-50 shadow-lg">
                 <div class="w-1/3 py-3">
-                    <div class="mt-2 flex-1 text-center text-2xl font-bold text-[#008387]">Hand Over (OPD)</div>
+                    <div class="mt-2 flex-1 text-center text-4xl font-bold text-[#008387]">Hand Over (OPD)</div>
                     <img class="m-auto mb-3 aspect-auto max-h-32 pt-3" src="{{ url("images/Side Logo.png") }}"
                         alt="logo">
                 </div>
@@ -69,7 +69,7 @@
                         </div>
                         <div class="flex">
                             <div class="w-24 flex-none">ประวัติแพ้ยา : </div>
-                            <div class="flex-1 text-red-600">{{ $data["info"]["allergic"] }}</div>
+                            <div class="flex-1 font-bold text-red-600">{{ $data["info"]["allergic"] }}</div>
                         </div>
                     </div>
                 </div>
@@ -100,7 +100,7 @@
                         <th class="border border-gray-400 p-3">App Message</th>
                     </thead>
                     @foreach ($data["background"] as $i => $item)
-                        <tr class="@if ($i % 2 == 0) bg-[#f7f7f7] @endif">
+                        <tr class="@if ($i % 2 == 0) bg-[#e7e7e7] @endif">
                             <td class="border border-gray-300 p-3 text-center">{{ $item["suffix"] }}</td>
                             <td class="border border-gray-300 p-3">{{ $item["clinic"] }}</td>
                             <td class="border border-gray-300 p-3">{{ $item["doctor"] }}</td>
@@ -210,7 +210,7 @@
                                     <td class="border border-gray-300 p-2">{{ $item["clinic"] }}</td>
                                     <td class="border border-gray-300 p-2">{{ $item["doctor"] }}</td>
                                     <td class="border border-gray-300 p-2 text-end font-bold" colspan="2">
-                                        RemarksMemo
+                                        Clinical Info
                                     </td>
                                     <td class="border border-gray-300 p-2" colspan="7">
                                         {{ $item["memo"] }}
@@ -226,7 +226,7 @@
                                     <td class="border border-gray-300 p-2">{{ $item["clinic"] }}</td>
                                     <td class="border border-gray-300 p-2">{{ $item["doctor"] }}</td>
                                     <td class="border border-gray-300 p-2 text-end font-bold" colspan="2">
-                                        RemarksMemo
+                                        Clinical Info
                                     </td>
                                     <td class="border border-gray-300 p-2" colspan="7">
                                         {{ $item["memo"] }}

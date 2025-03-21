@@ -173,7 +173,7 @@ class WebController extends Controller
                         $text = 'None';
                         break;
                     case '02':
-                        $text = 'High>ER';
+                        $text = 'High';
                         break;
                     default:
                         $text = 'None';
@@ -639,11 +639,11 @@ class WebController extends Controller
                     break;
                 case $lab->Ward == null && $lab->AppointmentDate == $date && $lab->SpecimenReceiveDate == $date:
                     $labToday       = true;
-                    $labAppointment = '(Appointment)';
+                    $labAppointment = '(A)';
                     $labCase        = 3;
                     break;
                 case $lab->Ward == null && $lab->AppointmentDate !== null && $lab->SpecimenReceiveDate == $date:
-                    $labAppointment = '(Appointment)';
+                    $labAppointment = '(A)';
                     $labToday       = true;
                     $labCase        = 4;
                     break;
@@ -669,7 +669,7 @@ class WebController extends Controller
                     'doctor'    => $lab->RequestDoctor,
                     'recommend' => null,
                     'status'    => $status,
-                    'memo'      => $lab->RemarksMemo,
+                    'memo'      => ($lab->RemarksMemo !== null) ? $lab->RemarksMemo : '-',
                 ];
             }
         }
@@ -728,12 +728,12 @@ class WebController extends Controller
                     break;
                 case $xray->Ward == null && $xray->AcknowledgeDate == $date && $xray->AppointmentDate == $date:
                     $xrayToday       = true;
-                    $xrayAppointment = '(Appointment)';
+                    $xrayAppointment = '(A)';
                     $xrayCase        = 2;
                     break;
                 case $xray->Ward == null && $xray->AcknowledgeDate == $date && $xray->AppointmentDate !== null:
                     $xrayToday       = true;
-                    $xrayAppointment = '(Appointment)';
+                    $xrayAppointment = '(A)';
                     $xrayCase        = 3;
                     break;
                 case $xray->Ward == null && $xray->EntryDateTime == $date && $xray->FacilityRmsNo == 'INV':
@@ -764,7 +764,7 @@ class WebController extends Controller
                     'doctor'    => $xray->RequestDoctor,
                     'recommend' => null,
                     'status'    => $status,
-                    'memo'      => ($xray->HNXRayRequestMemoType == 2) ? $xray->RemarksMemo : null,
+                    'memo'      => ($xray->HNXRayRequestMemoType == 2) ? $xray->RemarksMemo : '-',
                 ];
             }
         }
