@@ -624,26 +624,30 @@ class WebController extends Controller
             ($lab->AppointmentDateTime !== null) ? $lab->AppointmentDate         = date('Y-m-d', strtotime($lab->AppointmentDateTime)) : null;
 
             $labToday       = false;
+            $labCase        = null;
             $labAppointment = '';
             switch ($lab) {
                 case $lab->Ward == null && $lab->EntryDateTime == $date && $lab->AppointmentNo == null:
                     $labToday = true;
+                    $labCase  = 1;
                     break;
                 case $lab->Ward == null && $lab->EntryDateTime == $date && $lab->EntryDateTime == $lab->SpecimenReceiveDate:
                     $labToday = true;
+                    $labCase  = 2;
                     break;
                 case $lab->Ward == null && $lab->AppointmentDate == $date && $lab->SpecimenReceiveDate == $date:
                     $labToday       = true;
                     $labAppointment = '(Appointment)';
+                    $labCase        = 3;
                     break;
-                case $lab->Ward == null && $lab->AppointmentDateTime !== null && $lab->SpecimenReceiveDate == $date:
+                case $lab->Ward == null && $lab->AppointmentDate !== null && $lab->SpecimenReceiveDate == $date:
                     $labAppointment = '(Appointment)';
                     $labToday       = true;
+                    $labCase        = 4;
                     break;
             }
-            if ($showDebug) {
-                $debugLabText = ($labToday) ? 'True' : 'False';
-                dump($indexLab . ' ' . $debugLabText);
+            if ($showDebug && $labToday) {
+                dump($indexLab . ' Case : ' . $labCase);
             }
             if ($labToday) {
                 $status = null;
@@ -676,19 +680,18 @@ class WebController extends Controller
                 'HNXRAYREQ_HEADER.CxlDateTime',
                 'HNXRAYREQ_HEADER.EntryDateTime',
                 'HNXRAYREQ_HEADER.AppointmentDateTime',
+                'HNXRAYREQ_HEADER.AcknowledgeDateTime',
                 'HNXRAYREQ_HEADER.AcknowledgeFlag',
+                'HNXRAYREQ_CHARGE.ChargeDateTime',
+                'HNXRAYREQ_HEADER.DispatchFlimToDoctor',
                 'HNXRAYREQ_HEADER.FacilityRmsNo',
                 'HNXRAYREQ_HEADER.Clinic',
                 'HNXRAYREQ_HEADER.Ward',
-                'HNXRAYREQ_HEADER.AcknowledgeDateTime',
-                'HNXRAYREQ_HEADER.DispatchFlimToDoctor',
-                'HNXRAYREQ_HEADER.CxlDateTime',
-                'HNXRAYREQ_CHARGE.ChargeDateTime',
                 'HNXRAYREQ_HEADER.RequestNo',
                 'HNXRAYREQ_HEADER.RequestDoctor',
                 'HNXRAYREQ_HEADER.AppointmentNo',
-                'HNXRAYREQ_MEMO.RemarksMemo',
                 'HNXRAYREQ_MEMO.HNXRayRequestMemoType',
+                'HNXRAYREQ_MEMO.RemarksMemo',
             )
             ->get();
         if ($showDebug) {
@@ -699,6 +702,12 @@ class WebController extends Controller
             $xray->Clinic          = $this->ClinicName($xray->Clinic, $Clinics);
             $xray->RequestDoctor   = $this->DoctorName($xray->RequestDoctor, $Doctors);
             $xray->EntryDateTime   = date('Y-m-d', strtotime($xray->EntryDateTime));
+            $xray->AppointmentDate = null;
+            $xray->AppointmentTime = null;
+            if ($xray->AppointmentDateTime !== null) {
+                $xray->AppointmentDate = date('Y-m-d', strtotime($xray->AppointmentDateTime));
+                $xray->AppointmentTime = date('H:i', strtotime($xray->AppointmentDateTime));
+            }
             $xray->AcknowledgeDate = null;
             $xray->AcknowledgeTime = null;
             if ($xray->AcknowledgeDateTime !== null) {
@@ -707,27 +716,31 @@ class WebController extends Controller
             }
 
             $xrayToday       = false;
+            $xrayCase        = null;
             $xrayAppointment = '';
             switch ($xray) {
                 // case $xray->EntryDateTime == $date && $xray->AppointmentNo == null && $xray->AcknowledgeFlag == 1:
                 case $xray->Ward == null && $xray->EntryDateTime == $date && $xray->AppointmentNo == null:
                     $xrayToday = true;
+                    $xrayCase  = 1;
                     break;
-                case $xray->Ward == null && $xray->AcknowledgeDate == $date && $xray->AppointmentDateTime == $date:
+                case $xray->Ward == null && $xray->AcknowledgeDate == $date && $xray->AppointmentDate == $date:
                     $xrayToday       = true;
                     $xrayAppointment = '(Appointment)';
+                    $xrayCase        = 2;
                     break;
-                case $xray->Ward == null && $xray->AcknowledgeDate == $date && $xray->AppointmentDateTime !== null:
+                case $xray->Ward == null && $xray->AcknowledgeDate == $date && $xray->AppointmentDate !== null:
                     $xrayToday       = true;
                     $xrayAppointment = '(Appointment)';
+                    $xrayCase        = 3;
                     break;
                 case $xray->Ward == null && $xray->EntryDateTime == $date && $xray->FacilityRmsNo == 'INV':
                     $xrayToday = true;
+                    $xrayCase  = 4;
                     break;
             }
-            if ($showDebug) {
-                $debugXrayText = ($xrayToday) ? 'True' : 'False';
-                dump($indexXray . ' ' . $debugXrayText);
+            if ($showDebug && $xrayToday) {
+                dump($indexXray . ' Case : ' . $xrayCase);
             }
             if ($xrayToday) {
                 $status = null;
@@ -745,7 +758,7 @@ class WebController extends Controller
                 $data['assessment'][$xray->RequestNo] = [
                     'type'      => 'xray',
                     'time'      => $time,
-                    'clinic'    => $xray->FacilityRmsNo . " : " . $xray->Clinic . ' ' . $labAppointment,
+                    'clinic'    => $xray->FacilityRmsNo . " : " . $xray->Clinic . ' ' . $xrayAppointment,
                     'doctor'    => $xray->RequestDoctor,
                     'recommend' => null,
                     'status'    => $status,
