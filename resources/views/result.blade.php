@@ -215,9 +215,6 @@
                                     <td class="border border-gray-300 p-2" colspan="7">
                                         {{ $item["memo"] }}
                                     </td>
-                                    {{-- <td class="border border-gray-300 p-2 text-center font-bold text-[#008387]">
-                                        {{ $item["status"] }}
-                                    </td> --}}
                                 </tr>
                             @elseif($item["type"] == "xray")
                                 <tr
@@ -231,14 +228,13 @@
                                     <td class="border border-gray-300 p-2" colspan="7">
                                         {{ $item["memo"] }}
                                     </td>
-                                    {{-- <td class="border border-gray-300 p-2 text-center font-bold text-[#008387]">
-                                        {{ $item["status"] }}
-                                    </td> --}}
                                 </tr>
                             @elseif($item["type"] == "vs")
                                 <tr class="bg-[#ffe2c2]">
                                     <td class="border border-gray-300 p-2 text-center">{{ $item["time"] }}</td>
-                                    <td class="border border-gray-300 p-2" colspan="2">{{ $item["clinic"] }}</td>
+                                    <td class="border border-gray-300 p-2" colspan="2">
+                                        {{ $item["clinic"] }} : {{ $item["user"] }}
+                                    </td>
                                     <td
                                         class="@if ($item["temperature"] < 35.5 || $item["temperature"] > 37.4) text-red-600 @endif border border-gray-300 p-2 text-center">
                                         {{ $item["temperature"] }}

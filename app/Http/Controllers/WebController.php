@@ -581,6 +581,7 @@ class WebController extends Controller
                 'bmi'         => $bmi,
                 'pain'        => ($vs->PainScale == 0) ? 'N/A' : $vs->PainScale,
                 'memo'        => $vs->Remarks,
+                'user'        => $vs->EntryByUserCode,
             ];
 
             if ($indexVs + 1 == count($Vitalsigns)) {
@@ -607,6 +608,7 @@ class WebController extends Controller
                 'HNLABREQ_HEADER.AppointmentNo',
                 'HNLABREQ_HEADER.RequestDoctor',
                 'HNLABREQ_HEADER.Clinic',
+                'HNLABREQ_LOG.HNLABRequestLogType',
                 'HNLABREQ_LOG.MakeDateTime',
                 'HNLABREQ_MEMO.HNLABRequestMemoType',
                 'HNLABREQ_MEMO.RemarksMemo',
@@ -662,6 +664,7 @@ class WebController extends Controller
                 if ($lab->FacilityRmsNo == "DIET") {
                     $lab->Clinic = "Consult นักโภชนาการ";
                 }
+
                 $data['assessment'][$lab->RequestNo] = [
                     'type'      => 'lab',
                     'time'      => date('H:i', strtotime($lab->MakeDateTime)),
@@ -683,6 +686,7 @@ class WebController extends Controller
                 'HNXRAYREQ_HEADER.EntryDateTime',
                 'HNXRAYREQ_HEADER.AppointmentDateTime',
                 'HNXRAYREQ_HEADER.AcknowledgeDateTime',
+                'HNXRAYREQ_HEADER.ResultDateTime',
                 'HNXRAYREQ_HEADER.AcknowledgeFlag',
                 'HNXRAYREQ_CHARGE.ChargeDateTime',
                 'HNXRAYREQ_HEADER.DispatchFlimToDoctor',
@@ -754,6 +758,9 @@ class WebController extends Controller
                 if ($xray->DispatchFlimToDoctor == 1) {
                     $status = 'SUCCESS';
                 }
+                if ($xray->FacilityRmsNo == 'INV' && $xray->ResultDateTime !== null) {
+                    $status = 'SUCCESS';
+                }
                 if ($xray->CxlDateTime !== null) {
                     $status = 'Cxl';
                 }
@@ -783,6 +790,7 @@ class WebController extends Controller
                     'bmi'         => $dataList['bmi'],
                     'pain'        => $dataList['pain'],
                     'memo'        => $dataList['memo'],
+                    'user'        => $dataList['user'],
                 ];
             }
             if ($dataList['type'] == 'prescript') {
@@ -799,6 +807,7 @@ class WebController extends Controller
                         'bmi'         => null,
                         'pain'        => null,
                         'memo'        => null,
+                        'user'        => null,
                     ];
                 }
             }
