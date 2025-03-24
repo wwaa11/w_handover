@@ -80,12 +80,15 @@ class WebController extends Controller
     }
     public function DoctorName($code, $array)
     {
+        $name   = $code;
         $Doctor = collect($array)->where('Doctor', $code)->first();
-        mb_internal_encoding('UTF-8');
-        $name = mb_substr($Doctor->LocalName, 1);
-        if (str_contains($name, '\\')) {
-            $name = explode("\\", $name);
-            $name = $name[1] . $name[0];
+        if ($Doctor) {
+            mb_internal_encoding('UTF-8');
+            $name = mb_substr($Doctor->LocalName, 1);
+            if (str_contains($name, '\\')) {
+                $name = explode("\\", $name);
+                $name = $name[1] . $name[0];
+            }
         }
 
         return $name;
@@ -387,7 +390,7 @@ class WebController extends Controller
             ->select('CtrlCode', 'Code', 'LocalName')
             ->get();
         $Doctors = DB::connection('SSB')->table('HNDOCTOR_MASTER')
-            ->select('Doctor', 'LocalName', )
+            ->select('Doctor', 'LocalName')
             ->get();
         $Procedures = DB::connection('SSB')->table('DNSYSCONFIG')
             ->select('LocalName', 'CtrlCode', 'Code')

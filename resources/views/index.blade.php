@@ -39,10 +39,10 @@
                 </div>
                 <div id="resultVN"></div>
             </div>
-            <div class="flex gap-3 rounded-b bg-gray-100 p-3">
-                <button class="m-auto flex-1 cursor-pointer rounded bg-[#008387] p-3 text-center text-white" type="button"
-                    onclick="search()">View</button>
-                <button class="w-12 cursor-pointer rounded bg-red-500 text-white" onclick="resetFn()">
+            <div class="flex flex-row gap-3 rounded-b bg-gray-100 p-3">
+                <button class="m-auto flex-1 cursor-pointer rounded bg-[#008387] p-3 text-center text-white"
+                    id="viewMainBtn" type="button" onclick="search()">View</button>
+                <button class="w-12 flex-1 cursor-pointer rounded bg-red-500 p-3 text-white" onclick="resetFn()">
                     <i class="fa-solid fa-arrow-rotate-right"></i>
                 </button>
             </div>
@@ -89,6 +89,7 @@
         }
 
         async function searchHN() {
+            $('#viewMainBtn').hide()
             date = $('#date').val()
             hn = $('#hn').val()
 
@@ -181,11 +182,13 @@
         }
 
         function resetFn() {
+            $('#viewMainBtn').show()
             $('#date').val('{{ date("Y-m-d") }}');
             $('#hn').val('');
             $('#vn').val('');
             $('#name').val('');
             $('#dob').val('');
+            $('#resultVN').html('');
         }
     </script>
 @endsection
