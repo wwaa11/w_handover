@@ -4,7 +4,6 @@
         <div class="flex font-bold text-[#008387]">
             <img class="h-12" src="{{ url("images/Side Logo.png") }}" alt="logo">
             <span class="inline-block p-3 align-baseline text-lg">Hand Over (OPD)</span>
-
         </div>
         <button class="my-1 cursor-pointer rounded bg-blue-600 p-3 text-white" type="button" onclick="homeBtn()">
             <i class="fa-solid fa-house"></i> HOME
@@ -81,11 +80,17 @@
                     <thead class="text-[#008387]">
                         <th class="w-1/3 border border-gray-400 p-3 text-xl">Chief Complaint</th>
                     </thead>
-                    @foreach ($data["situation"] as $item)
+                    @if (count($data["situation"]) == 0)
                         <tr class="">
-                            <td class="border border-gray-300 p-3">{{ $item["text"] }}</td>
+                            <td class="border border-gray-300 p-3">-</td>
                         </tr>
-                    @endforeach
+                    @else
+                        @foreach ($data["situation"] as $item)
+                            <tr class="">
+                                <td class="border border-gray-300 p-3">{{ $item["text"] }}</td>
+                            </tr>
+                        @endforeach
+                    @endif
                 </table>
             </div>
             <div class="my-6 w-full rounded-lg border border-[#008387] bg-gray-50 p-3 shadow-lg">
@@ -204,7 +209,7 @@
                                 </tr>
                             @elseif($item["type"] == "lab")
                                 <tr
-                                    class="@if ($item["status"] == "SUCCESS") bg-green-200 @elseif($item["status"] == "Cxl") bg-red-300 @else bg-gray-100 @endif">
+                                    class="bg-gray-100">
                                     <td class="border border-gray-300 p-2 text-center">
                                         @if ($data["debug"])
                                             <span class="block text-red-600">{{ $item["requestno"] }}</span>
@@ -217,12 +222,12 @@
                                         Clinical Info
                                     </td>
                                     <td class="border border-gray-300 p-2" colspan="5">
-                                        {{ $item["memo"] }}
+                                        {{ $item["memo"] }} @if ($item["status"] == "Cxl") <span class="text-red-600 float-end">CXL</span> @endif
                                     </td>
                                 </tr>
                             @elseif($item["type"] == "xray")
                                 <tr
-                                    class="@if ($item["status"] == "SUCCESS") bg-green-200 @elseif($item["status"] == "Cxl") bg-red-300 @else bg-gray-100 @endif">
+                                    class="bg-gray-100">
                                     <td class="border border-gray-300 p-2 text-center">
                                         @if ($data["debug"])
                                             <span class="block text-red-600">{{ $item["requestno"] }}</span>
@@ -235,7 +240,7 @@
                                         Clinical Info
                                     </td>
                                     <td class="border border-gray-300 p-2" colspan="5">
-                                        {{ $item["memo"] }}
+                                        {{ $item["memo"] }} @if ($item["status"] == "Cxl") <span class="text-red-600 float-end">CXL</span> @endif
                                     </td>
                                 </tr>
                             @elseif($item["type"] == "vs")
@@ -274,7 +279,7 @@
                                 </tr>
                             @elseif($item["type"] == "vs_notification")
                                 <tr class="bg-red-400">
-                                    <td class="border border-gray-300 p-2">{{ $item["time"] }}</td>
+                                    <td class="border border-gray-300 p-2 text-center">{{ $item["time"] }}</td>
                                     <td class="border border-gray-300 p-2 text-center" colspan="10">แจ้งเตือนวัด
                                         Vital Sign
                                         อีกครั้ง (ทุก 4 ชั่วโมง)</td>
@@ -300,12 +305,18 @@
                     <div class="text-2xl font-bold text-[#008387]">Remark Memo</div>
                     <hr class="my-3 border-[#008387]">
                     <table class="w-full table-auto">
-                        @foreach ($data["memo"] as $item)
+                        @if (count($data["situation"]) == 0)
                             <tr class="">
-                                <td class="w-12 border border-gray-300 p-3">{{ $item["no"] }}</td>
-                                <td class="border border-gray-300 p-3">{{ $item["memo"] }}</td>
+                                <td class="border border-gray-300 p-3">-</td>
                             </tr>
-                        @endforeach
+                        @else
+                            @foreach ($data["memo"] as $item)
+                                <tr class="">
+                                    <td class="w-12 border border-gray-300 p-3">{{ $item["no"] }}</td>
+                                    <td class="border border-gray-300 p-3">{{ $item["memo"] }}</td>
+                                </tr>
+                            @endforeach
+                        @endif
                     </table>
                 </div>
             </div>

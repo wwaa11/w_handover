@@ -515,12 +515,17 @@ class WebController extends Controller
                 'text'      => ($prescript->HNAppointmentMsgType == 5) ? $prescript->AppointmentMemo : null,
             ];
 
+            $recommendText = '';
+            if ($prescript->Recommend !== null) {
+                $recommendText = $prescript->Recommend;
+            }
+
             $data['assessment'][$prescript->No] = [
                 'type'      => 'prescript',
                 'time'      => $this->setTime($prescript, $prescript->CloseVisitCode),
                 'clinic'    => $prescript->Clinic,
                 'doctor'    => $prescript->Doctor,
-                'recommend' => ($prescript->Recommend !== null) ? $prescript->Recommend : '-',
+                'recommend' => $recommendText . ' ' . $BackgroundText,
                 'iso'       => $this->setAssessmentText($prescript->SymptomaticCode, 'isolation'),
                 'con'       => $this->setAssessmentText($prescript->EscortCode, 'consciousness'),
                 'fall'      => $this->setAssessmentText($prescript->VisitPurposeCode, 'fall'),
@@ -714,6 +719,7 @@ class WebController extends Controller
                 'HNXRAYREQ_MEMO.HNXRayRequestMemoType',
                 'HNXRAYREQ_MEMO.RemarksMemo',
             )
+            ->orderBy('HNXRAYREQ_HEADER.EntryDateTime', 'DESC')
             ->get();
         if ($showDebug) {
             dump('Xrays');
@@ -722,6 +728,7 @@ class WebController extends Controller
         foreach ($Xrays as $indexXray => $xray) {
             $xray->Clinic          = $this->ClinicName($xray->Clinic, $Clinics);
             $xray->RequestDoctor   = $this->DoctorName($xray->RequestDoctor, $Doctors);
+            $xray->EntryTime       = date('H:i', strtotime($xray->EntryDateTime));
             $xray->EntryDateTime   = date('Y-m-d', strtotime($xray->EntryDateTime));
             $xray->AppointmentDate = null;
             $xray->AppointmentTime = null;
@@ -768,7 +775,10 @@ class WebController extends Controller
                 if ($xray->FacilityRmsNo == 'INV') {
                     $time = date('H:i', strtotime($xray->ChargeDateTime));
                 } else {
-                    $time = date('H:i', strtotime($xray->AcknowledgeTime));
+                    $time = date('H:i', strtotime($xray->EntryTime));
+                }
+                if ($xrayAppointment == '(A)') {
+                    $time = $xray->AppointmentTime;
                 }
                 if ($xray->DispatchFlimToDoctor == 1) {
                     $status = 'SUCCESS';
